@@ -12,8 +12,9 @@ it to your includes either programmatically::
 
 or in the config.ini file::
 
-    pyramid.includes = pyramid_tm
-    pyramid.includes = steward_sqlalchemy
+    pyramid.includes = 
+        pyramid_tm
+        steward_sqlalchemy
 
 Usage
 =====
