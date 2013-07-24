@@ -50,3 +50,4 @@ def includeme(config):
     engine = engine_from_config(settings, prefix='sqlalchemy.')
     config.registry.dbmaker = sessionmaker(bind=engine,
                                            extension=ZopeTransactionExtension())
+    config.registry.subrequest_methods.append('db')
