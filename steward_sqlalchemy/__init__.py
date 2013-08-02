@@ -3,16 +3,18 @@ import json
 from sqlalchemy import engine_from_config
 import sqlalchemy.ext.declarative
 from sqlalchemy.orm import sessionmaker
-#pylint: disable=F0401,E0611
+# pylint: disable=F0401,E0611
 from zope.sqlalchemy import ZopeTransactionExtension
-#pylint: enable=F0401,E0611
+# pylint: enable=F0401,E0611
 
 
 __base__ = sqlalchemy.ext.declarative.declarative_base()
 
+
 def declarative_base():
     """ Retrieve the global declarative base class """
     return __base__
+
 
 def _db(request):
     """ Access a sqlalchemy session """
@@ -25,6 +27,7 @@ def _db(request):
     request.add_finished_callback(cleanup)
 
     return session
+
 
 def create_schema(registry):
     """
@@ -42,6 +45,25 @@ def create_schema(registry):
 
     """
     __base__.metadata.create_all(bind=registry.dbmaker.kw['bind'])
+
+
+def drop_schema(registry):
+    """
+    Drop the database schema
+
+    Parameters
+    ----------
+    registry : dict
+        The configuration registry
+
+    Notes
+    -----
+    The method should only be called after importing all modules containing
+    models which extend the ``Base`` object.
+
+    """
+    __base__.metadata.drop_all(bind=registry.dbmaker.kw['bind'])
+
 
 def includeme(config):
     """ Configure the app """

@@ -37,6 +37,12 @@ DATA = {
     'zip_safe': False,
     'include_package_data': True,
     'packages': find_packages(),
+    'entry_points': {
+        'console_scripts': [
+            'steward-create-schema = steward_sqlalchemy.scripts:run_create_schema',
+            'steward-drop-schema = steward_sqlalchemy.scripts:run_drop_schema',
+        ],
+    },
     'setup_requires': [
         'nose>=1.0',
     ],
