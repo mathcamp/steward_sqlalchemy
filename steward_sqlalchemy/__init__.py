@@ -7,8 +7,13 @@ from sqlalchemy.orm import sessionmaker
 from zope.sqlalchemy import ZopeTransactionExtension
 # pylint: enable=F0401,E0611
 
+from .mixins import SelfAwareModel, JsonableMixin, ModelEqualityMixin
+
 
 __base__ = sqlalchemy.ext.declarative.declarative_base()
+
+__all__ = ['declarative_base', 'SelfAwareModel', 'JsonableMixin',
+           'ModelEqualityMixin']
 
 
 def declarative_base():
