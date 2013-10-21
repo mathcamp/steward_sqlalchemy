@@ -1,5 +1,8 @@
 """ Useful mixins for models """
-import sqlalchemy
+import inspect
+
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+
 
 class SelfAwareModel(object):
 
@@ -9,9 +12,9 @@ class SelfAwareModel(object):
     def _columns(cls):
         """ Get the names of all attributes that are SQL columns """
         columns = []
-        for name in dir(cls):
-            if isinstance(getattr(cls, name),
-                          sqlalchemy.orm.attributes.InstrumentedAttribute):
+        for name, member in inspect.getmembers(cls):
+            if (not name.startswith('_') and
+                    isinstance(member, InstrumentedAttribute)):
                 columns.append(name)
         return columns
 
@@ -19,6 +22,7 @@ class SelfAwareModel(object):
     def _primary_key_columns(cls):
         """ Get the names of all attributes that are primary key columns """
         return [col for col in cls._columns() if getattr(cls, col).primary_key]
+
 
 class ModelEqualityMixin(SelfAwareModel):
 
