@@ -1,8 +1,8 @@
 """ Steward extension that adds sqlalchemy """
-import json
-from sqlalchemy import engine_from_config
 import sqlalchemy.ext.declarative
+from sqlalchemy import engine_from_config
 from sqlalchemy.orm import sessionmaker
+
 # pylint: disable=F0401,E0611
 from zope.sqlalchemy import ZopeTransactionExtension
 # pylint: enable=F0401,E0611
@@ -68,6 +68,37 @@ def drop_schema(registry):
 
     """
     __base__.metadata.drop_all(bind=registry.dbmaker.kw['bind'])
+
+
+class DatabaseTaskMixin(object):
+
+    """ Celery task mixin with sqlalchemy session """
+    _sessionmaker = None
+    _db = None
+
+    @property
+    def db(self):
+        """ Get the database session object """
+        if self._sessionmaker is None:
+            engine = engine_from_config(self.config.settings,
+                                        prefix='sqlalchemy.')
+            self._sessionmaker = sessionmaker(bind=engine)
+        if self._db is None:
+            self._db = self._sessionmaker()
+
+            def cleanup(task, status, retval, task_id, args, kwargs, einfo):
+                """ Close the session after the task """
+                if einfo is None:
+                    task.db.commit()
+                else:
+                    task.db.rollback()
+            self.callbacks.append(cleanup)
+        return self._db
+
+
+def include_tasks(config):
+    """ Add tasks """
+    config.mixins.append(DatabaseTaskMixin)
 
 
 def includeme(config):
